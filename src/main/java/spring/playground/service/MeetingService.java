@@ -13,4 +13,10 @@ public interface MeetingService {
     void leaveMeeting(Long meetingId, String memberName);
 
     void deleteMeeting(Long meetingId);
+
+    void reserveSeat(Long meetingId);
+
+    void reserveSeatWithLock(Long meetingId);
+
+    void cancelSeat(Long meetingId);
 }

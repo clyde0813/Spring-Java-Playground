@@ -13,7 +13,6 @@ import spring.playground.service.MeetingService;
 
 @Service
 @RequiredArgsConstructor
-@Transactional
 public class MeetingServiceImpl implements MeetingService{
     
     private final MeetingRepository meetingRepository;
@@ -55,6 +54,25 @@ public class MeetingServiceImpl implements MeetingService{
 
     @Override
     public void deleteMeeting(Long meetingId) {
+        
+    }
+
+    @Override
+    public void reserveSeat(Long meetingId) {
+        Meeting meeting = meetingRepository.findById(meetingId).orElseThrow();
+        meeting.reserveSeat();
+        meetingRepository.save(meeting);
+    }
+
+    @Override
+    @Transactional
+    public void reserveSeatWithLock(Long meetingId) {
+        Meeting meeting = meetingRepository.findByIdWithLock(meetingId).orElseThrow();
+        meeting.reserveSeat();
+    }
+
+    @Override
+    public void cancelSeat(Long meetingId) {
         
     }
 }

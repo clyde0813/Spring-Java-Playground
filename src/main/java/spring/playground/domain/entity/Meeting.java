@@ -33,7 +33,8 @@ public class Meeting {
     private String name;
 
     @Column(nullable = false)
-    private int seats;
+    @Builder.Default
+    private int seats = 100;
     
     @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, orphanRemoval = true)
     private final Set<Participant> participants = new HashSet<>();
