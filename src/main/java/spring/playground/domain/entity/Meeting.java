@@ -32,7 +32,18 @@ public class Meeting {
     @Column(nullable = false, unique = true)
     private String name;
 
+    @Column(nullable = false)
+    private int seats;
     
     @OneToMany(mappedBy = "meeting", cascade = CascadeType.ALL, orphanRemoval = true)
     private final Set<Participant> participants = new HashSet<>();
+
+    public void reserveSeat() {
+        if (seats <= 0) throw new IllegalStateException("No seats left");
+        seats--;
+    }
+
+    public void cancelSeat() {
+        seats++;
+    }
 }
