@@ -11,7 +11,7 @@ import org.springframework.util.StopWatch;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class ConcurrencyTest {
+public class SynchronizedTest {
 
     private int threadCount = 100;
     private int threadPool = 10;
@@ -26,15 +26,17 @@ public class ConcurrencyTest {
         counter = 0;
     }
 
-    int raceConditionSituation(int threadCount, int threadPool, int sleep) throws InterruptedException {
+    int synchronizedSituation(int threadCount, int threadPool, int sleep) throws InterruptedException {
         ExecutorService executor = Executors.newFixedThreadPool(threadPool);
         CountDownLatch latch = new CountDownLatch(threadCount);
 
         for(int i=0; i<threadCount; i++) {
             executor.execute(() -> {
-                int temp = counter;
-                sleep(sleep);
-                counter = temp + 1;
+                synchronized (this) {
+                    int temp = counter;
+                    sleep(sleep);
+                    counter = temp + 1;
+                }
                 latch.countDown();
             });
         }
@@ -47,25 +49,25 @@ public class ConcurrencyTest {
     }
 
     // @Test
-    void raceConditionTest() throws InterruptedException {
+    void synchronizedTest() throws InterruptedException {
 
-        int result = raceConditionSituation(threadCount, threadPool, sleep);
+        int result = synchronizedSituation(threadCount, threadPool, sleep);
 
         System.out.println("Counter = " + result);
-        assertThat(result).isNotEqualTo(threadCount);
+        assertThat(result).isEqualTo(threadCount);
     }
 
     @Test
-    void measureFailureRateUnderRaceCondition() throws InterruptedException {
+    void measureFailureRateUnderSynchronized() throws InterruptedException {
         StopWatch sw = new StopWatch();
-        sw.start("measureFailureRateUnderRaceCondition");
+        sw.start("measureFailureRateUnderSynchronized");
         
         int failureCount = 0;
 
         for(int i=0; i<testCount; i++) {
-            int result = raceConditionSituation(threadCount, threadPool, sleep);
+            int result = synchronizedSituation(threadCount, threadPool, sleep);
             if(result != threadCount) {
-                // System.out.println("ThreadCount = " + threadCount + " Counter = " + result + " at iteration " + i);
+                System.out.println("ThreadCount = " + threadCount + " Counter = " + result + " at iteration " + i);
                 failureCount++;
             }
             counter = 0;
@@ -74,7 +76,7 @@ public class ConcurrencyTest {
         sw.stop();
         System.out.println(sw.prettyPrint());
         System.out.println("Failure rate = " + (double)failureCount/testCount);
-        assertThat(failureCount).isNotEqualTo(0);
+        assertThat(failureCount).isEqualTo(0);
     }
 
     private void sleep(int millis) {
