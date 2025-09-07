@@ -5,8 +5,8 @@
   channel = "stable-23.11"; # or "unstable"
   # Use https://search.nixos.org/packages to find packages
   packages = [
-    pkgs.zulu17
-    pkgs.maven
+    pkgs.zulu21
+    pkgs.gradle
   ];
   # Sets environment variables in the workspace
   env = {};
