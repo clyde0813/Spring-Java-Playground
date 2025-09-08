@@ -65,7 +65,6 @@ public class AtomicTest {
         for(int i=0; i<testCount; i++) {
             int result = atomicSituation(threadCount, threadPool, sleep);
             if(result != threadCount) {
-                System.out.println("ThreadCount = " + threadCount + " Counter = " + result + " at iteration " + i);
                 failureCount++;
             }
             counter = new AtomicInteger(0);
@@ -73,7 +72,7 @@ public class AtomicTest {
 
         sw.stop();
         System.out.println(sw.prettyPrint());
-        System.out.println("Failure rate = " + (double)failureCount/testCount);
+        System.out.println("Failure rate = " + ((double)failureCount/testCount * 100) + "%");
         assertThat(failureCount).isEqualTo(0);
     }
 

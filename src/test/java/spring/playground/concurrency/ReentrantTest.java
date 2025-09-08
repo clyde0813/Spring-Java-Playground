@@ -4,6 +4,7 @@ import java.util.concurrent.CountDownLatch;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.TimeUnit;
+import java.util.concurrent.locks.ReentrantLock;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -11,7 +12,7 @@ import org.springframework.util.StopWatch;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-public class SynchronizedTest {
+public class ReentrantTest {
 
     private int threadCount = TestConfig.THREAD_COUNT.getValue();
     private int threadPool = TestConfig.THREAD_POOL_SIZE.getValue();
@@ -21,23 +22,29 @@ public class SynchronizedTest {
 
     private int counter = 0;
 
+    private final ReentrantLock lock = new ReentrantLock();
+
     @BeforeEach
     void resetCounter() {
         counter = 0;
     }
 
-    int synchronizedSituation(int threadCount, int threadPool, int sleep) throws InterruptedException {
+    int reentrantSituation(int threadCount, int threadPool, int sleep) throws InterruptedException {
         ExecutorService executor = Executors.newFixedThreadPool(threadPool);
         CountDownLatch latch = new CountDownLatch(threadCount);
 
         for(int i=0; i<threadCount; i++) {
             executor.execute(() -> {
-                synchronized (this) {
+                lock.lock();
+                try {
                     int temp = counter;
                     sleep(sleep);
                     counter = temp + 1;
                 }
-                latch.countDown();
+                finally {
+                    lock.unlock();
+                    latch.countDown();
+                }
             });
         }
 
@@ -49,23 +56,23 @@ public class SynchronizedTest {
     }
 
     // @Test
-    void synchronizedTest() throws InterruptedException {
+    void reentrantTest() throws InterruptedException {
 
-        int result = synchronizedSituation(threadCount, threadPool, sleep);
+        int result = reentrantSituation(threadCount, threadPool, sleep);
 
         System.out.println("Counter = " + result);
         assertThat(result).isEqualTo(threadCount);
     }
 
     @Test
-    void measureFailureRateUnderSynchronized() throws InterruptedException {
+    void measureFailureRateUnderReentrant() throws InterruptedException {
         StopWatch sw = new StopWatch();
-        sw.start("measureFailureRateUnderSynchronized");
+        sw.start("measureFailureRateUnderReentrant");
         
         int failureCount = 0;
 
         for(int i=0; i<testCount; i++) {
-            int result = synchronizedSituation(threadCount, threadPool, sleep);
+            int result = reentrantSituation(threadCount, threadPool, sleep);
             if(result != threadCount) {
                 failureCount++;
             }

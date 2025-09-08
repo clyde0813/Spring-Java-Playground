@@ -13,11 +13,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class ConcurrencyTest {
 
-    private int threadCount = 100;
-    private int threadPool = 10;
-    private int sleep = 10;
+    private int threadCount = TestConfig.THREAD_COUNT.getValue();
+    private int threadPool = TestConfig.THREAD_POOL_SIZE.getValue();
+    private int sleep = TestConfig.SLEEP_MILLIS.getValue();
 
-    private int testCount = 100;
+    private int testCount = TestConfig.TEST_COUNT.getValue();
 
     private int counter = 0;
 
@@ -65,7 +65,6 @@ public class ConcurrencyTest {
         for(int i=0; i<testCount; i++) {
             int result = raceConditionSituation(threadCount, threadPool, sleep);
             if(result != threadCount) {
-                // System.out.println("ThreadCount = " + threadCount + " Counter = " + result + " at iteration " + i);
                 failureCount++;
             }
             counter = 0;
@@ -73,7 +72,7 @@ public class ConcurrencyTest {
 
         sw.stop();
         System.out.println(sw.prettyPrint());
-        System.out.println("Failure rate = " + (double)failureCount/testCount);
+        System.out.println("Failure rate = " + ((double)failureCount/testCount * 100) + "%");
         assertThat(failureCount).isNotEqualTo(0);
     }
 
