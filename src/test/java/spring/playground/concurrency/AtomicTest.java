@@ -14,11 +14,11 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 public class AtomicTest {
 
-    private int threadCount = 100;
-    private int threadPool = 10;
-    private int sleep = 10;
+    private final int threadCount = TestConfig.THREAD_COUNT.getValue();
+    private final int threadPool = TestConfig.THREAD_POOL_SIZE.getValue();
+    private final int sleep = TestConfig.SLEEP_MILLIS.getValue();
 
-    private int testCount = 100;
+    private final int testCount = TestConfig.TEST_COUNT.getValue();
 
     private AtomicInteger counter = new AtomicInteger(0);
 
@@ -71,8 +71,9 @@ public class AtomicTest {
         }
 
         sw.stop();
-        System.out.println(sw.prettyPrint());
-        System.out.println("Failure rate = " + ((double)failureCount/testCount * 100) + "%");
+        System.out.println("AtomicInteger Test");
+        System.out.print(sw.prettyPrint());
+        System.out.println("Failure rate = " + ((double)failureCount/testCount * 100) + "% \n");
         assertThat(failureCount).isEqualTo(0);
     }
 
