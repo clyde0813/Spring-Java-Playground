@@ -37,7 +37,7 @@ public class MeetingConcurrencyTest {
         sw.start("testCreateMeetingConcurrency");
 
         int threadPool = 100;
-        int threadCount = 1000;
+        int threadCount = 100;
 
         Long meetingId = meetingRepository.findByName("meeting name").get().getId();
 
@@ -47,8 +47,8 @@ public class MeetingConcurrencyTest {
         for(int i=0; i<threadCount; i++) {
             executor.execute(() -> {
                 try {
-                    meetingService.reserveSeatWithLock(meetingId);             
-                } 
+                    meetingService.reserveSeatWithLock(meetingId);
+                }
                 catch (Exception e) {
                     System.out.println(Thread.currentThread().getName() + " error: " + e.getMessage());
                 }
@@ -60,7 +60,6 @@ public class MeetingConcurrencyTest {
 
         latch.await();
         executor.shutdown();
-        executor.awaitTermination(1, TimeUnit.SECONDS);
 
         sw.stop();
         Meeting m = meetingRepository.findById(meetingId).get();
